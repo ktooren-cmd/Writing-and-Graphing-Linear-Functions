@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#5b46b6">
+  <meta name="description" content="Explore slope, write linear equations, and graph lines in a touch-friendly, self-contained math activity.">
+  <title>Writing and Graphing Linear Functions</title>
+  <style>
+    :root { color-scheme: light; --ink:#25243b; --muted:#626276; --purple:#5b46b6; --purple-dark:#46338f; --lavender:#f0ecfb; --border:#dedde8; --teal:#14766e; --amber:#a95513; --paper:#faf9f6; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:radial-gradient(ellipse at top right,#eeebf7 0,transparent 55%),var(--paper); color:var(--ink); font:16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    button,input,select,textarea { font:inherit; }
+    button,select { cursor:pointer; }
+    button { min-height:44px; border:1px solid var(--border); border-radius:10px; padding:9px 15px; background:white; color:var(--ink); font-weight:600; touch-action:manipulation; }
+    button:hover { background:#f4f2fa; border-color:#b8afd6; }
+    button:disabled { opacity:.5; cursor:default; }
+    input,select,textarea { min-height:44px; border:1px solid #bdbacb; border-radius:9px; background:white; color:var(--ink); padding:9px 11px; width:100%; min-width:0; }
+    input::placeholder { color:#777487; }
+    input:disabled { background:#f1f0f4; }
+    :focus-visible { outline:3px solid #a084ed; outline-offset:3px; }
+    input:focus-visible,select:focus-visible { outline-offset:1px; }
+    label { display:block; font-size:13px; font-weight:650; margin-bottom:5px; color:#565269; }
+    h1,h2,h3,p { margin:0; }
+    h1 { font-size:clamp(27px,3.8vw,40px); line-height:1.15; letter-spacing:-1.1px; font-weight:750; margin:18px 0 12px; }
+    h2 { font-size:23px; line-height:1.25; letter-spacing:-.5px; }
+    h3 { font-size:16px; }
+    [hidden] { display:none !important; }
+    .page { max-width:1180px; margin:auto; padding:30px 28px 36px; }
+    .masthead { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .brand { display:flex; align-items:center; gap:10px; color:var(--purple); font-size:12px; font-weight:800; letter-spacing:1.9px; }
+    .brand-icon { width:33px; height:33px; border-radius:9px; background:var(--purple); color:white; padding:6px; }
+    .progress-pill { background:white; border:1px solid var(--border); border-radius:99px; padding:6px 13px; font-size:13px; color:var(--muted); white-space:nowrap; }
+    .progress-pill b { color:var(--purple); }
+    .intro { color:var(--muted); max-width:750px; margin-bottom:25px; }
+    .widget { background:white; border:1px solid var(--border); border-radius:20px; box-shadow:0 12px 42px #34305709; overflow:hidden; }
+    .tabs { display:grid; grid-template-columns:repeat(3,1fr); padding:8px; gap:6px; border-bottom:1px solid var(--border); background:#fbfafc; }
+    .tab { display:flex; justify-content:center; align-items:center; gap:10px; border:0; background:transparent; border-radius:12px; min-height:53px; color:var(--muted); }
+    .tab[aria-pressed="true"] { background:var(--purple); color:white; box-shadow:0 3px 8px #49319020; }
+    .tab-number { font-size:12px; display:grid; place-items:center; width:24px; height:24px; border-radius:50%; border:1px solid currentColor; opacity:.85; flex-shrink:0; }
+    .activity-controls { display:flex; align-items:end; gap:12px; padding:18px 24px; border-bottom:1px solid var(--border); }
+    .control { flex:1; max-width:270px; }
+    .new-button { margin-left:auto; background:var(--lavender); color:var(--purple-dark); border-color:#ddd4f4; white-space:nowrap; }
+    .workspace { display:grid; grid-template-columns:minmax(0,1.13fr) minmax(0,1fr); }
+    .graph-panel { padding:23px 24px; border-right:1px solid var(--border); min-width:0; }
+    .panel-heading { display:flex; gap:10px; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .eyebrow { font-size:11px; font-weight:800; letter-spacing:1.5px; color:var(--muted); text-transform:uppercase; }
+    .graph-heading { font-size:17px; font-weight:700; }
+    .range-control { width:116px; flex-shrink:0; }
+    .range-control label { margin:0; font-size:11px; }
+    .range-control select { min-height:44px; padding:4px 8px; font-size:16px; }
+    .graph-shell { border:1px solid var(--border); background:#fcfcff; border-radius:14px; overflow:hidden; }
+    #graph { display:block; width:100%; height:auto; aspect-ratio:1; user-select:none; -webkit-user-select:none; touch-action:none; }
+    #graph.read-only { touch-action:pan-y; }
+    #graph .point { cursor:grab; }
+    #graph .point:focus { outline:none; }
+    #graph .point:focus .point-halo { stroke:#a084ed; stroke-width:4; fill:#e8e1ff; fill-opacity:.45; }
+    #graph.add-tool { cursor:crosshair; }
+    .graph-tools { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+    .graph-tools button { padding:8px 12px; font-size:13px; flex:1; white-space:nowrap; }
+    .graph-tools button[aria-pressed="true"] { background:var(--lavender); color:var(--purple-dark); border-color:#b7a5e3; }
+    .graph-note { font-size:12px; color:var(--muted); margin:10px 0; min-height:36px; }
+    .check-label { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; color:var(--muted); margin:0; cursor:pointer; min-height:44px; }
+    .check-label input { width:18px; min-height:18px; height:18px; accent-color:var(--purple); flex-shrink:0; }
+    .graph-switches { display:flex; flex-wrap:wrap; column-gap:16px; }
+    .point-editor { margin-top:12px; border-top:1px solid #eeecf3; padding-top:15px; }
+    .point-fields { display:grid; grid-template-columns:1.15fr 1fr 1fr; gap:8px; }
+    .point-actions { display:flex; gap:8px; margin-top:9px; }
+    .point-actions button { font-size:13px; flex:1; }
+    .task-panel { padding:25px 27px; min-width:0; }
+    .task-panel .eyebrow { margin-bottom:7px; }
+    .directions { color:var(--muted); font-size:14px; margin-top:10px; margin-bottom:19px; }
+    .tip { padding:12px 14px; border-radius:10px; background:var(--lavender); color:#493779; font-size:13px; margin-bottom:18px; }
+    .slope-controls { display:grid; grid-template-columns:1fr 1fr auto; align-items:end; gap:8px; margin:15px 0 20px; }
+    .slope-controls button { padding:9px 12px; font-size:13px; }
+    .calc-stack { display:grid; gap:10px; }
+    .calc-card { border:1px solid var(--border); border-radius:12px; padding:12px 15px; }
+    .calc-title { font-size:11px; font-weight:750; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
+    .equation { font-family:"Cambria Math",Cambria,Georgia,serif; font-size:25px; letter-spacing:.1px; line-height:1.4; overflow-wrap:anywhere; }
+    .calc-detail { color:var(--muted); font-size:12px; margin-top:4px; }
+    .line-badge { display:inline-block; font-size:11px; font-weight:700; color:var(--teal); border-radius:5px; background:#eaf6f2; padding:3px 7px; margin-bottom:10px; }
+    .worked-steps { font-size:13px; margin-top:15px; color:var(--muted); }
+    details summary { cursor:pointer; font-weight:650; min-height:44px; display:flex; align-items:center; gap:9px; list-style:none; }
+    details summary::-webkit-details-marker { display:none; }
+    details summary::before { content:"+"; color:var(--purple); font-size:18px; font-weight:500; }
+    details[open] summary::before { content:"−"; }
+    .steps-content { padding:2px 0 12px; }
+    .steps-content p + p { margin-top:9px; }
+    .given-card { background:#f8f7fc; border:1px solid #e6e1f4; border-radius:12px; padding:17px 18px; margin-bottom:20px; }
+    .given-card p { font-size:15px; }
+    .given-card .equation { font-size:28px; }
+    .given-label { font-size:11px; color:var(--purple); letter-spacing:1.1px; font-weight:800; text-transform:uppercase; margin-bottom:7px; }
+    .point-table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; text-align:center; }
+    .point-table th { color:var(--purple-dark); background:#efebf8; font-weight:650; }
+    .point-table th,.point-table td { padding:9px; border-bottom:1px solid #e4dfef; }
+    .point-table tr:last-child td { border:0; }
+    .answer-field { margin-bottom:13px; }
+    .slope-answer { display:grid; grid-template-columns:1.15fr 1fr; gap:8px; }
+    .equation-input { font-family:"Cambria Math",Cambria,Georgia,serif; font-size:20px; }
+    .field-help { font-size:12px; color:var(--muted); margin:6px 0 0; }
+    .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
+    .primary { background:var(--purple); color:white; border-color:var(--purple); }
+    .primary:hover { background:var(--purple-dark); color:white; }
+    .actions .primary { flex:1; }
+    .actions button { font-size:14px; }
+    .link-button { background:transparent; border-color:transparent; color:var(--purple-dark); font-size:13px; padding:8px 4px; text-decoration:underline; text-underline-offset:3px; }
+    .feedback { margin-top:15px; padding:12px 14px; border-radius:10px; font-size:14px; line-height:1.5; background:#f3f1f8; color:#49415c; }
+    .feedback.success { background:#e9f5ef; color:#19634b; }
+    .feedback.retry { background:#fff3e6; color:#864810; }
+    .solution { border-top:1px solid var(--border); margin-top:16px; padding-top:16px; }
+    .solution p { font-size:13px; color:var(--muted); margin:7px 0; }
+    .solution .equation { font-size:23px; }
+    .graph-steps { margin:5px 0 16px; padding-left:22px; font-size:14px; color:var(--muted); }
+    .graph-steps li { padding-left:3px; margin:8px 0; }
+    .widget-footer { padding:0 24px; border-top:1px solid var(--border); background:#fcfbfe; }
+    .reference summary { font-size:14px; }
+    .reference-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; padding:8px 0 20px; }
+    .reference-grid p { font-size:13px; color:var(--muted); margin-top:6px; }
+    .reference-grid .equation { font-size:19px; margin:8px 0; }
+    .session-row { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12px; color:var(--muted); padding:12px 2px 0; }
+    .session-row button { font-size:12px; min-height:44px; background:transparent; border-color:transparent; padding:6px 9px; color:var(--purple); }
+    .session-summary { background:white; border:1px solid var(--border); border-radius:12px; padding:15px; font-size:13px; margin-top:8px; }
+    .session-summary textarea { margin-top:10px; height:155px; font-size:13px; resize:vertical; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    @media (min-width:701px) and (max-width:1000px) { .graph-panel,.task-panel { padding:20px 17px; } .equation { font-size:23px; } .slope-controls { grid-template-columns:1fr 1fr; } .slope-controls button { grid-column:1/-1; } }
+    @media (max-width:700px) { .workspace { grid-template-columns:1fr; } .graph-panel { border-right:0; border-bottom:1px solid var(--border); } .graph-shell { max-width:610px; margin:auto; } .task-panel { padding:24px; } .graph-note { min-height:0; } }
+    @media (max-width:700px) { .widget[data-mode="graph"] .task-panel,.widget[data-mode="write"][data-source="words"] .task-panel,.widget[data-mode="write"][data-source="table"] .task-panel { order:-1; border-bottom:1px solid var(--border); } }
+    @media (max-width:540px) { .page { padding:20px 12px; } h1 { letter-spacing:-.7px; } .intro { font-size:14px; margin-bottom:20px; } .brand { letter-spacing:1.1px; font-size:10px; } .progress-pill { font-size:12px; padding:5px 9px; } .tabs { padding:6px; gap:3px; } .tab { font-size:12px; gap:5px; padding:8px 5px; } .tab-number { width:20px; height:20px; font-size:10px; } .activity-controls { padding:14px 16px; flex-wrap:wrap; gap:10px; } .control { max-width:none; min-width:130px; } .new-button { width:100%; margin:0; } .graph-panel,.task-panel { padding:18px 16px; } .widget-footer { padding:0 16px; } .reference-grid { grid-template-columns:1fr; gap:16px; } .slope-controls { grid-template-columns:1fr 1fr; } .slope-controls button { grid-column:1/-1; } .session-row { align-items:flex-start; } }
+    @media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto !important; } }
+    @media print { body { background:white; } .page { max-width:none; padding:0; } .tabs,.activity-controls,.graph-tools,.point-editor,.actions,.session-row,.slope-controls { display:none; } .workspace { grid-template-columns:1fr 1fr; } .widget { box-shadow:none; } .graph-panel { border-right:1px solid var(--border); } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="masthead">
+        <div class="brand"><svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2v18h18M3 17L19 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="13" r="2" fill="currentColor"/><circle cx="16" cy="7" r="2" fill="currentColor"/></svg> LINEAR FUNCTIONS LAB</div>
+        <div class="progress-pill"><b id="solved-count">0</b> solved this session</div>
+      </div>
+      <h1>Writing and Graphing Linear Functions</h1>
+      <p class="intro">Move the points. Notice the slope. Connect the graph to its equation.<br>Explore first, then try writing and graphing on your own.</p>
+    </header>
+    <main class="widget" aria-label="Linear functions activity">
+      <nav class="tabs" aria-label="Activity views">
+        <button class="tab" data-mode="explore" aria-pressed="true"><span class="tab-number" aria-hidden="true">1</span>Explore a line</button>
+        <button class="tab" data-mode="write" aria-pressed="false"><span class="tab-number" aria-hidden="true">2</span>Write an equation</button>
+        <button class="tab" data-mode="graph" aria-pressed="false"><span class="tab-number" aria-hidden="true">3</span>Graph a line</button>
+      </nav>
+      <div class="activity-controls">
+        <div class="control" id="source-control" hidden><label for="source-select">Start with</label><select id="source-select"><option value="graph">A graph with points</option><option value="words">A point and a slope</option><option value="table">A table of points</option></select></div>
+        <div class="control" id="form-control" hidden><label for="form-select">Given equation</label><select id="form-select"><option value="point">Point-slope form</option><option value="intercept">Slope-intercept form</option></select></div>
+        <div class="control"><label for="kind-select">Line type</label><select id="kind-select"><option value="mixed">All line types</option><option value="ordinary">Sloped line</option><option value="horizontal">Horizontal · HOY</option><option value="vertical">Vertical · VUX</option></select></div>
+        <button class="new-button" id="new-problem">New example ↻</button>
+      </div>
+      <div class="workspace">
+        <section class="graph-panel" aria-labelledby="graph-heading">
+          <div class="panel-heading"><div><div class="eyebrow">Make it visible</div><h2 class="graph-heading" id="graph-heading">Coordinate plane</h2></div><div class="range-control"><label for="range-select">Grid range</label><select id="range-select"><option value="8">−8 to 8</option><option value="12">−12 to 12</option><option value="20">−20 to 20</option></select></div></div>
+          <div class="graph-shell"><svg id="graph" viewBox="0 0 560 560" role="group" aria-labelledby="graph-title graph-description"></svg></div>
+          <div class="graph-tools" id="graph-tools" role="group" aria-label="Graph tools">
+            <button id="move-tool" aria-pressed="true">Move</button><button id="add-tool" aria-pressed="false">Add point</button><button id="draw-line">Draw line</button><button id="reset-graph">Reset</button>
+          </div>
+          <p class="graph-note" id="graph-note"></p>
+          <div class="graph-switches">
+            <label class="check-label"><input id="triangle-toggle" type="checkbox" checked>Show rise &amp; run</label>
+            <label class="check-label" id="given-toggle-label" hidden><input id="given-toggle" type="checkbox">Show given points</label>
+          </div>
+          <div class="point-editor" id="point-editor">
+            <div class="point-fields">
+              <div><label for="point-select">Point</label><select id="point-select"></select></div>
+              <div><label for="point-x">x-coordinate</label><input id="point-x" inputmode="text" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="coordinate-help"></div>
+              <div><label for="point-y">y-coordinate</label><input id="point-y" inputmode="text" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="coordinate-help"></div>
+            </div>
+            <div class="point-actions"><button id="update-point">Update point</button><button id="remove-point">Remove point</button></div>
+            <p class="field-help" id="coordinate-help">Use numbers or fractions, such as −2 or 1/2. Coordinates: −20 to 20.</p>
+          </div>
+        </section>
+        <section class="task-panel" aria-labelledby="task-title">
+          <div class="eyebrow" id="task-eyebrow">See the connections</div><h2 id="task-title">One line, two forms</h2>
+          <p class="directions" id="directions"></p>
+          <div id="task-content"></div>
+          <div id="feedback" class="feedback" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+          <div id="solution" class="solution" hidden></div>
+        </section>
+      </div>
+      <div class="widget-footer">
+        <details class="reference"><summary>Formula guide · slope, point-slope, HOY &amp; VUX</summary>
+          <div class="reference-grid">
+            <div><h3>Connect the forms</h3><div class="equation">m = (y₂ − y₁)/(x₂ − x₁)</div><div class="equation">y − y₁ = m(x − x₁)</div><div class="equation">y = mx + b &nbsp; · &nbsp; b = y₁ − mx₁</div><p>Slope is signed rise ÷ signed run. Use a point on the line in point-slope form. The y-intercept is (0, b).</p></div>
+            <div><h3>HOY: horizontal, zero, y</h3><div class="equation">m = 0 &nbsp; · &nbsp; y = k</div><p>Horizontal lines keep the same y-coordinate. Their rise is 0. Point-slope form is y − k = 0(x − x₁); slope-intercept form simplifies to y = k.</p></div>
+            <div><h3>VUX: vertical, undefined, x</h3><div class="equation">m is undefined &nbsp; · &nbsp; x = k</div><p>Vertical lines keep the same x-coordinate. Their run is 0, and division by zero is undefined. They have no point-slope or slope-intercept form and are not functions of x.</p></div>
+          </div>
+        </details>
+      </div>
+    </main>
+    <div class="session-row"><span>No sign-in. Progress stays in this session and resets when you reload.</span><button id="progress-button" aria-expanded="false" aria-controls="session-summary">View progress</button></div>
+    <div id="session-summary" class="session-summary" hidden><h3>Your practice snapshot</h3><p>Copy this anonymous summary to share or reflect on your work. Solutions revealed before a correct check do not count as solved.</p><textarea id="summary-text" readonly aria-label="Anonymous practice summary"></textarea><button id="copy-summary">Copy summary</button><span id="copy-status" role="status"></span></div>
+    <noscript><p>This activity needs JavaScript enabled in your browser.</p></noscript>
+  </div>
+  <script>
+  'use strict';
+  // Everything runs locally. No network requests, dependencies, or student records.
+  const $ = id => document.getElementById(id);
+  const EPS = 1e-8;
+  const LETTERS = 'ABCDEFGH';
+  const banks = {
+    ordinary: [
+      [[-2,-1],[2,5],[0,2]], [[-3,4],[3,0],[0,2]], [[-4,-3],[2,0],[0,-1]],
+      [[-2,3],[2,-5],[0,-1]], [[1,-2],[3,4],[2,1]], [[-3,-2],[3,2],[0,0]],
+      [[-4,5],[4,-1],[0,2]], [[-1,-3],[3,5],[1,1]], [[-3,3],[3,-6],[1,-3]]
+    ],
+    horizontal: [ [[-3,3],[3,3],[0,3]], [[-4,-2],[4,-2],[0,-2]], [[-2,0],[4,0],[0,0]], [[-3,5],[2,5],[0,5]] ],
+    vertical: [ [[-2,-3],[-2,3],[-2,0]], [[3,-4],[3,4],[3,0]], [[0,-3],[0,3],[0,0]], [[-4,-2],[-4,4],[-4,1]] ]
+  };
+  const state = { mode:'explore', source:'graph', form:'point', filter:'mixed', sequence:0, familyIndex:0,
+    bankIndex:{ordinary:0,horizontal:0,vertical:0}, problem:null, points:[], basePoints:[], selected:0,
+    extent:8, tool:'move', drawn:true, triangle:true, showGiven:false, revealed:false, solved:false,
+    hintLevel:0, attempts:0, records:[], drag:null, problemID:0 };
+
+  function gcd(a,b) { a=Math.abs(a); b=Math.abs(b); while(b>0) { const next=a%b; a=b; b=next; } return a||1; }
+  function fmt(value) {
+    if (Math.abs(value)<EPS) return '0';
+    if (Math.abs(value-Math.round(value))<EPS) return String(Math.round(value));
+    // Prefer a small exact fraction, with a decimal fallback for arbitrary input.
+    for(let d=2;d<=1000;d++) { const n=Math.round(value*d); if(Math.abs(value-n/d)<EPS) { const g=gcd(n,d); return (n/g)+'/'+(d/g); } }
+    return String(Number(value.toFixed(5)));
+  }
+  const pretty = value => fmt(value).replace(/-/g,'−');
+  const pair = p => '('+pretty(p.x)+', '+pretty(p.y)+')';
+  const offset = (letter,value) => letter+(Math.abs(value)<EPS?'':value<0?' + '+pretty(-value):' − '+pretty(value));
+  const coefficient = value => fmt(value).includes('/')?'('+pretty(value)+')':pretty(value);
+  function model(points) {
+    if(points.length<2) return null;
+    const [a,b]=points, dx=b.x-a.x, dy=b.y-a.y;
+    if(Math.abs(dx)<EPS && Math.abs(dy)<EPS) return {degenerate:true,a,b,dx,dy};
+    const vertical=Math.abs(dx)<EPS, m=vertical?null:dy/dx;
+    return {a,b,dx,dy,vertical,m,intercept:vertical?null:a.y-m*a.x,c:[dy,-dx,dx*a.y-dy*a.x]};
+  }
+  function pointForm(line) {
+    if(line.vertical) return 'x = '+pretty(line.a.x);
+    return offset('y',line.a.y)+' = '+coefficient(line.m)+'('+offset('x',line.a.x)+')';
+  }
+  function interceptForm(line) {
+    if(line.vertical) return 'Not available for a vertical line';
+    if(Math.abs(line.m)<EPS) return 'y = '+pretty(line.intercept);
+    const m=Math.abs(line.m-1)<EPS?'':Math.abs(line.m+1)<EPS?'−':coefficient(line.m);
+    const b=Math.abs(line.intercept)<EPS?'':line.intercept<0?' − '+pretty(-line.intercept):' + '+pretty(line.intercept);
+    return 'y = '+m+'x'+b;
+  }
+  function lineKind(line) { return line.vertical?'VUX · vertical':Math.abs(line.m)<EPS?'HOY · horizontal':line.m>0?'Positive slope':'Negative slope'; }
+  function makeProblem() {
+    const families=['ordinary','horizontal','vertical'];
+    const kind=state.filter==='mixed'?families[state.familyIndex++%3]:state.filter;
+    const index=state.bankIndex[kind]++%banks[kind].length;
+    const points=banks[kind][index].map(([x,y])=>({x,y}));
+    state.problem={kind,points,line:model(points)};
+    state.problemID++;
+    state.points=state.mode==='explore'?points.slice(0,2).map(p=>({...p})):[];
+    state.basePoints=state.points.map(p=>({...p}));
+    state.selected=state.points.length?0:-1;
+    state.drawn=state.mode==='explore'; state.tool='move'; state.revealed=false; state.solved=false;
+    state.hintLevel=0; state.attempts=0; state.showGiven=false; state.drag=null;
+    $('given-toggle').checked=false;
+    clearFeedback(); renderTask(); updateEditor(); drawGraph(); updateTools(); updateProgress();
+  }
+  function modeChange(mode) {
+    state.mode=mode;
+    document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)));
+    $('source-control').hidden=mode!=='write'; $('form-control').hidden=mode!=='graph';
+    $('graph-tools').hidden=mode==='write'; $('point-editor').hidden=mode==='write';
+    $('new-problem').textContent=mode==='explore'?'New example ↻':'New problem ↻';
+    makeProblem();
+  }
+  function feedback(message,type='info') {
+    $('feedback').textContent=message; $('feedback').className='feedback '+type; $('feedback').hidden=false;
+  }
+  function clearFeedback() { $('feedback').hidden=true; $('feedback').textContent=''; }
+  function renderTask() {
+    document.querySelector('.widget').dataset.mode=state.mode;
+    document.querySelector('.widget').dataset.source=state.source;
+    $('solution').hidden=true; $('solution').innerHTML='';
+    $('given-toggle-label').hidden=!(state.mode==='write'&&state.source!=='graph');
+    const line=state.problem.line, vertical=line.vertical;
+    if(state.mode==='explore') {
+      $('task-eyebrow').textContent='See the connections'; $('task-title').textContent='One line, two forms';
+      $('directions').textContent='Drag A or B to change the line. Change rise and run to try a new slope while keeping A fixed.';
+      $('task-content').innerHTML=`<div class="tip">A and B define the line. Watch what happens to both equations as you move them.</div>
+        <div class="slope-controls"><div><label for="rise-input">Signed rise</label><input id="rise-input" inputmode="text" value="${fmt(line.dy)}"></div><div><label for="run-input">Signed run</label><input id="run-input" inputmode="text" value="${fmt(line.dx)}"></div><button id="apply-slope">Apply slope</button></div>
+        <div id="calculations"></div><details class="worked-steps"><summary>How do we get the equations?</summary><div class="steps-content" id="calculation-steps"></div></details>`;
+      $('apply-slope').addEventListener('click',applySlope);
+      updateCalculations();
+    } else if(state.mode==='write') {
+      $('task-eyebrow').textContent='Read · calculate · write';
+      $('task-title').textContent=vertical?'Write a vertical line':'Write the equations';
+      $('directions').textContent=vertical?'Find the slope type and write the line equation. Vertical lines use x = a constant.':'Find the slope, then write point-slope form. Try slope-intercept form too. Use any point on the line.';
+      let given='';
+      if(state.source==='graph') given='<div class="tip">Read the two labeled points on the graph. Find signed rise and run before writing the equation.</div>';
+      if(state.source==='words') given=`<div class="given-card"><div class="given-label">Your starting information</div><p>A line passes through <strong>${pair(line.a)}</strong> and has <strong>${vertical?'undefined slope':'slope m = '+pretty(line.m)}</strong>.</p></div>`;
+      if(state.source==='table') given=`<div class="given-card"><div class="given-label">Points on the same line</div><table class="point-table"><caption class="sr-only">Three points on the given line</caption><thead><tr><th scope="col">x</th><th scope="col">y</th></tr></thead><tbody>${state.problem.points.map(p=>`<tr><td>${pretty(p.x)}</td><td>${pretty(p.y)}</td></tr>`).join('')}</tbody></table></div>`;
+      $('task-content').innerHTML=given+`<form id="answer-form" novalidate>
+        <div class="answer-field"><label for="slope-type">Slope</label><div class="slope-answer"><select id="slope-type"><option value="number">A number</option><option value="undefined">Undefined</option></select><input id="slope-input" inputmode="text" placeholder="e.g. −2/3" aria-label="Slope value"></div></div>
+        <div class="answer-field"><label for="point-equation">${vertical?'Line equation':'Point-slope form'}</label><input class="equation-input" id="point-equation" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="${vertical?'x = …':'y − … = …(x − …)'}"><p class="field-help">${vertical?'VUX: vertical, undefined slope, x = constant.':'Type fractions as 2/3. Use + for a negative coordinate: x − (−3) = x + 3.'}</p></div>
+        <div class="answer-field"><label for="intercept-equation">Slope-intercept form ${vertical?'':'(optional)'}</label><input class="equation-input" id="intercept-equation" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="${vertical?'No slope-intercept form':'y = …x + …'}" ${vertical?'disabled':''}></div>
+        <div class="actions"><button class="primary" type="submit">Check answer</button><button id="hint-button" type="button">Hint</button></div></form><button id="solution-button" class="link-button">Show solution</button>`;
+      $('answer-form').addEventListener('submit',e=>{e.preventDefault();checkWriting();});
+      $('slope-type').addEventListener('change',()=>{ $('slope-input').disabled=$('slope-type').value==='undefined'; });
+      $('hint-button').addEventListener('click',showHint); $('solution-button').addEventListener('click',showSolution);
+    } else {
+      $('task-eyebrow').textContent='Read · plot · connect'; $('task-title').textContent='Build the graph';
+      $('directions').textContent=vertical?'This is a vertical line, so its equation uses x = a constant. Neither of the two function forms applies.':'Turn the given equation into points, then draw the line through them.';
+      const eq=state.form==='point'?pointForm(line):vertical?pointForm(line):interceptForm(line);
+      $('task-content').innerHTML=`<div class="given-card"><div class="given-label">${vertical?'Vertical line equation':state.form==='point'?'Given point-slope form':'Given slope-intercept form'}</div><div class="equation">${eq}</div></div>
+        <ol class="graph-steps"><li>Choose <strong>Add point</strong> and tap the grid, or use the coordinate fields.</li><li>Plot two distinct points. Choose <strong>Draw line</strong> to connect A and B.</li><li>Check your graph. Drag points to revise it.</li></ol>
+        <div class="tip">${vertical?'All points on this line have the same x-coordinate.':state.form==='point'?'Find the point (x₁, y₁), then use slope = rise/run to find another point.':'Start at the y-intercept (0, b), then use slope = rise/run to find another point.'}</div>
+        <div class="actions"><button class="primary" id="check-graph">Check graph</button><button id="hint-button">Hint</button></div><button id="solution-button" class="link-button">Show solution</button>`;
+      $('check-graph').addEventListener('click',checkGraph); $('hint-button').addEventListener('click',showHint); $('solution-button').addEventListener('click',showSolution);
+    }
+  }
+  function updateCalculations() {
+    if(state.mode!=='explore') return;
+    const line=model(state.points);
+    if(!line||line.degenerate) {
+      $('calculations').innerHTML='<div class="tip">Use two distinct points to determine a unique line. Add or move B.</div>';
+      $('calculation-steps').textContent='One point, or two identical points, does not determine a unique line.'; return;
+    }
+    const slope=line.vertical?'Undefined':pretty(line.m);
+    $('calculations').innerHTML=`<span class="line-badge">${lineKind(line)}</span><div class="calc-stack">
+      <div class="calc-card"><div class="calc-title">Slope · rise ÷ run</div><div class="equation">m = ${slope}</div><div class="calc-detail">Signed rise = ${pretty(line.dy)} &nbsp; · &nbsp; signed run = ${pretty(line.dx)}${line.vertical?' · cannot divide by 0':''}</div></div>
+      <div class="calc-card"><div class="calc-title">${line.vertical?'Vertical line equation':'Point-slope form'}</div><div class="equation">${pointForm(line)}</div><div class="calc-detail">${line.vertical?'Every point has x = '+pretty(line.a.x):'Using point A '+pair(line.a)}</div></div>
+      <div class="calc-card"><div class="calc-title">Slope-intercept form</div>${line.vertical?'<div class="calc-detail">No slope-intercept form. A vertical line is not a function of x.</div>':`<div class="equation">${interceptForm(line)}</div><div class="calc-detail">y-intercept: (0, ${pretty(line.intercept)})</div>`}</div></div>`;
+    if(line.vertical) $('calculation-steps').innerHTML=`<p>run = ${pretty(line.b.x)} − (${pretty(line.a.x)}) = 0. Slope requires dividing rise by run, so the slope is undefined.</p><p>Both points have x = ${pretty(line.a.x)}. Write <strong>x = ${pretty(line.a.x)}</strong>. One x-value has many y-values, so this is not a function of x.</p>`;
+    else $('calculation-steps').innerHTML=`<p><strong>1. Calculate slope.</strong><br>m = (${pretty(line.b.y)} − (${pretty(line.a.y)})) / (${pretty(line.b.x)} − (${pretty(line.a.x)})) = ${pretty(line.dy)} / ${pretty(line.dx)} = ${pretty(line.m)}</p><p><strong>2. Substitute A into y − y₁ = m(x − x₁).</strong><br>${pointForm(line)}</p><p><strong>3. Distribute and solve for y.</strong><br>b = y₁ − mx₁ = ${pretty(line.a.y)} − (${pretty(line.m)})(${pretty(line.a.x)}) = ${pretty(line.intercept)}<br>${interceptForm(line)}</p>`;
+  }
+
+  // Safe arithmetic / linear-expression parser. No eval or Function constructor.
+  // Each node carries [constant, x coefficient, y coefficient] and its syntax tree.
+  function parseExpression(text) {
+    text=String(text).replace(/[−–—]/g,'-').replace(/[×·]/g,'*').replace(/÷/g,'/').toLowerCase();
+    if(text.length>160) throw Error('Keep the expression under 160 characters.');
+    const tokens=[]; let position=0;
+    while(position<text.length) {
+      if(/\s/.test(text[position])) { position++; continue; }
+      const number=text.slice(position).match(/^(?:\d+(?:\.\d*)?|\.\d+)/);
+      if(number) { tokens.push({type:'number',value:Number(number[0])}); position+=number[0].length; }
+      else if('xy+-*/()'.includes(text[position])) tokens.push({type:text[position++]});
+      else throw Error('Use x, y, numbers, fractions, +, −, and parentheses.');
+    }
+    let i=0;
+    const scalar=n=>Math.abs(n.v[1])<EPS&&Math.abs(n.v[2])<EPS;
+    function node(kind,v,left=null,right=null) {
+      if(v.some(n=>!Number.isFinite(n)||Math.abs(n)>1e12)) throw Error('Use smaller numbers.');
+      return {kind,v,left,right};
+    }
+    function factor() {
+      const t=tokens[i++]; if(!t) throw Error('Complete the expression.');
+      if(t.type==='+') return factor();
+      if(t.type==='-') { const a=factor(); return node('neg',a.v.map(n=>-n),a); }
+      if(t.type==='number') return node('number',[t.value,0,0]);
+      if(t.type==='x') return node('x',[0,1,0]);
+      if(t.type==='y') return node('y',[0,0,1]);
+      if(t.type==='(') { const a=expression(); if(tokens[i++]?.type!==')') throw Error('Check your parentheses.'); return node('group',a.v,a); }
+      throw Error('Check the signs and parentheses.');
+    }
+    function term() {
+      let a=factor();
+      while(i<tokens.length) {
+        const type=tokens[i].type;
+        if(type!=='*'&&type!=='/'&&!['number','x','y','('].includes(type)) break;
+        const operation=type==='/'?'div':'mul'; if(type==='*'||type==='/') i++;
+        const b=factor();
+        if(operation==='div') {
+          if(!scalar(b)||Math.abs(b.v[0])<EPS) throw Error('Divide only by a nonzero number.');
+          a=node('div',a.v.map(n=>n/b.v[0]),a,b);
+        } else {
+          if(!scalar(a)&&!scalar(b)) throw Error('This activity uses linear equations; do not multiply variables.');
+          const v=scalar(a)?b.v.map(n=>n*a.v[0]):a.v.map(n=>n*b.v[0]); a=node('mul',v,a,b);
+        }
+      }
+      return a;
+    }
+    function expression() {
+      let a=term();
+      while(tokens[i]&&['+','-'].includes(tokens[i].type)) {
+        const type=tokens[i++].type, b=term(); a=node(type==='+'?'add':'sub',a.v.map((n,j)=>n+(type==='+'?1:-1)*b.v[j]),a,b);
+      }
+      return a;
+    }
+    if(!tokens.length) throw Error('Enter an expression.');
+    const result=expression(); if(i!==tokens.length) throw Error('Check the expression.'); return result;
+  }
+  function numeric(text) {
+    const p=parseExpression(text); if(Math.abs(p.v[1])>EPS||Math.abs(p.v[2])>EPS) throw Error('Enter a number or a fraction.'); return p.v[0];
+  }
+  function parseEquation(text) {
+    const sides=String(text).split('='); if(sides.length!==2) throw Error('Include one equals sign in each equation.');
+    const left=parseExpression(sides[0]),right=parseExpression(sides[1]);
+    const v=left.v.map((n,i)=>n-right.v[i]);
+    if(Math.abs(v[1])<EPS&&Math.abs(v[2])<EPS) throw Error('Your equation must describe a line.');
+    return {left,right,c:[v[1],v[2],v[0]]};
+  }
+  function equivalent(a,b) {
+    const n=Math.hypot(a[0],a[1]),q=Math.hypot(b[0],b[1]); if(n<EPS||q<EPS) return false;
+    const sign=(a[0]*b[0]+a[1]*b[1])<0?-1:1;
+    return a.every((v,i)=>Math.abs(v/n-sign*b[i]/q)<1e-7);
+  }
+  function isPointSlope(eq,line) {
+    const left=eq.left.v;
+    if(Math.abs(left[1])>EPS||Math.abs(left[2]-1)>EPS) return false;
+    const scalar=n=>Math.abs(n.v[1])<EPS&&Math.abs(n.v[2])<EPS;
+    function xGroup(n) {
+      if(n.kind==='group'&&Math.abs(n.v[1]-1)<EPS&&Math.abs(n.v[2])<EPS) return true;
+      if(n.kind==='group') return xGroup(n.left);
+      if(n.kind==='neg') return xGroup(n.left);
+      if(n.kind==='mul') return scalar(n.left)&&xGroup(n.right)||scalar(n.right)&&xGroup(n.left);
+      if(n.kind==='div') return scalar(n.right)&&xGroup(n.left);
+      return false;
+    }
+    return xGroup(eq.right);
+  }
+  function isIntercept(eq) { return Math.abs(eq.left.v[0])<EPS&&Math.abs(eq.left.v[1])<EPS&&Math.abs(eq.left.v[2]-1)<EPS&&Math.abs(eq.right.v[2])<EPS; }
+  function recordAttempt(success) {
+    state.attempts++;
+    const name=state.mode==='write'?{graph:'Write from a graph',words:'Write from a point & slope',table:'Write from a table'}[state.source]:state.form==='point'?'Graph from point-slope':'Graph from slope-intercept';
+    let r=state.records.find(r=>r.id===state.problemID);
+    if(!r) { r={id:state.problemID,name,kind:state.problem.kind,checks:0,solved:false,hints:0,revealed:false}; state.records.push(r); }
+    r.checks++; r.hints=state.hintLevel; r.revealed=state.revealed;
+    if(success&&!state.solved&&!state.revealed) { state.solved=true; r.solved=true; }
+    updateProgress();
+  }
+  function successMessage() { return state.revealed?'Your work matches the line. Try a new problem without revealing the solution.':'Correct! Try a new problem or a different starting form.'; }
+  function checkWriting() {
+    const line=state.problem.line; let error='';
+    try {
+      if(line.vertical) {
+        if($('slope-type').value!=='undefined') error='The x-values stay the same. The run is 0, so choose undefined slope.';
+      } else if($('slope-type').value==='undefined') error='The run is not 0. Calculate the slope as signed rise ÷ signed run.';
+      else if(Math.abs(numeric($('slope-input').value)-line.m)>EPS) error='Check the slope: use (y₂ − y₁)/(x₂ − x₁), subtracting the coordinates in the same order.';
+      if(!error) {
+        const eq=parseEquation($('point-equation').value);
+        if(!equivalent(eq.c,line.c)) error=line.vertical?'Every point has the same x-coordinate. Write x = that value.':'Your equation describes a different line. Check the slope and the signs of the point you substituted.';
+        else if(!line.vertical&&!isPointSlope(eq,line)) error=Math.abs(line.m)<EPS?'That is the correct horizontal line. Include its zero slope in point-slope form: y − y₁ = 0(x − x₁).':'That is the correct line. Now write it in point-slope form: y − y₁ = m(x − x₁).';
+      }
+      const optional=$('intercept-equation').value.trim();
+      if(!error&&!line.vertical&&optional) {
+        const eq=parseEquation(optional);
+        if(!equivalent(eq.c,line.c)) error='Your point-slope form works. Recheck slope-intercept form using b = y₁ − mx₁.';
+        else if(!isIntercept(eq)) error='The second equation is the correct line. Solve it for y to write y = mx + b.';
+      }
+    } catch(e) { error=e.message; }
+    recordAttempt(!error);
+    feedback(error||successMessage(),error?'retry':'success');
+  }
+  function checkGraph() {
+    const target=state.problem.line, candidate=model(state.points); let message='';
+    if(!candidate||candidate.degenerate) message='Plot two distinct points first. A and B must be in different locations.';
+    else if(!state.drawn) message='Choose Draw line to draw the line through A and B, then check again.';
+    else if(!equivalent(candidate.c,target.c)) {
+      const parallel=target.vertical&&candidate.vertical||!target.vertical&&!candidate.vertical&&Math.abs(target.m-candidate.m)<EPS;
+      message=parallel?'Your slope is correct. Move the line so that it passes through a point from the given equation.':'Your line has a different slope. Recheck rise/run and the signs in the given equation.';
+      if(target.vertical) message='VUX: every point must have x = '+pretty(target.a.x)+'. Move A and B to that x-coordinate.';
+      else if(Math.abs(target.m)<EPS) message='HOY: every point must have y = '+pretty(target.a.y)+'. Your line should be horizontal.';
+    } else if(state.points.some(p=>Math.abs(target.c[0]*p.x+target.c[1]*p.y+target.c[2])/Math.hypot(target.c[0],target.c[1])>1e-7)) message='A and B define the correct line, but an extra point is off the line. Move or remove it.';
+    recordAttempt(!message); feedback(message||successMessage(),message?'retry':'success');
+  }
+  function showHint() {
+    const line=state.problem.line; state.hintLevel++;
+    let message;
+    if(line.vertical) message='The x-coordinate stays '+pretty(line.a.x)+'. The run is 0, so the slope is undefined. Use x = '+pretty(line.a.x)+'.';
+    else if(state.hintLevel===1) message=state.mode==='write'?'Use signed rise ÷ signed run. Choose the same order when subtracting x- and y-coordinates.':state.form==='point'?'In y − y₁ = m(x − x₁), read the coordinates carefully: x + 3 means x₁ = −3.':'In y = mx + b, start with the point (0, b). Slope m tells you signed rise/run.';
+    else if(state.hintLevel===2) message=state.mode==='write'?'For A to B: rise = '+pretty(line.dy)+' and run = '+pretty(line.dx)+'. Reduce the fraction.':'The slope is '+pretty(line.m)+'. One point on the line is '+(state.form==='intercept'?pair({x:0,y:line.intercept}):pair(line.a))+'.';
+    else message='The slope is '+pretty(line.m)+'. Use the point '+pair(line.a)+' in y − y₁ = m(x − x₁). To find b, calculate y₁ − mx₁.';
+    const r=state.records.find(r=>r.id===state.problemID); if(r) r.hints=state.hintLevel;
+    feedback(message); updateProgress();
+  }
+  function showSolution() {
+    state.revealed=true;
+    const r=state.records.find(r=>r.id===state.problemID); if(r) r.revealed=true;
+    const line=state.problem.line;
+    $('solution').innerHTML=`<div class="given-label">Worked solution</div><p>${line.vertical?'run = 0 → slope is undefined.':'m = '+pretty(line.dy)+' / '+pretty(line.dx)+' = '+pretty(line.m)}</p><div class="equation">${pointForm(line)}</div>${line.vertical?'<p>Vertical lines have no point-slope or slope-intercept form.</p>':`<p>b = ${pretty(line.a.y)} − (${pretty(line.m)})(${pretty(line.a.x)}) = ${pretty(line.intercept)}</p><div class="equation">${interceptForm(line)}</div>`}<p>Two possible graph points: A ${pair(line.a)} and B ${pair(line.b)}.</p>`;
+    $('solution').hidden=false;
+    if(state.mode==='graph') feedback('The dashed amber line is the solution. Your points and line stay editable.');
+    drawGraph(); updateProgress();
+  }
+
+  // SVG coordinates remain square at every screen size; pointer coordinates use the SVG matrix.
+  function graphPoints() { return state.mode==='write'?(state.source==='graph'||state.showGiven?state.problem.points.slice(0,2):[]):state.points; }
+  const plot = p => ({x:280+p.x*240/state.extent,y:280-p.y*240/state.extent});
+  const xml = text => String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
+  function lineEnds(line) {
+    if(!line||line.degenerate) return null;
+    const r=state.extent, hits=[];
+    function add(x,y) { if(x>=-r-EPS&&x<=r+EPS&&y>=-r-EPS&&y<=r+EPS&&!hits.some(p=>Math.abs(p.x-x)<EPS&&Math.abs(p.y-y)<EPS)) hits.push({x,y}); }
+    if(line.vertical) { add(line.a.x,-r); add(line.a.x,r); }
+    else { add(-r,line.m*-r+line.intercept); add(r,line.m*r+line.intercept); if(Math.abs(line.m)>EPS) { add((-r-line.intercept)/line.m,-r); add((r-line.intercept)/line.m,r); } }
+    return hits.length>=2?hits.slice(0,2).map(plot):null;
+  }
+  function svgLine(line,color,dashed=false) {
+    const ends=lineEnds(line); if(!ends) return '';
+    return `<line x1="${ends[0].x}" y1="${ends[0].y}" x2="${ends[1].x}" y2="${ends[1].y}" stroke="${color}" stroke-width="3.5" ${dashed?'stroke-dasharray="9 7"':''} stroke-linecap="round"/>`;
+  }
+  function labelPos(p) {
+    const q=plot(p); return {x:Math.max(58,Math.min(490,q.x+13)),y:Math.max(59,Math.min(510,q.y-15)),anchor:q.x>425?'end':'start'};
+  }
+  function drawGraph(focusIndex=null) {
+    const points=graphPoints(), editable=state.mode!=='write', line=model(points), r=state.extent, tickStep=r===20?5:r===12?2:1;
+    const textScale=560/Math.max(280,$('graph').getBoundingClientRect().width);
+    const tickFont=Math.max(12,Math.round(11*textScale)),pointFont=Math.max(14,Math.round(12*textScale)),guideFont=Math.max(13,Math.round(11*textScale));
+    let svg=`<title id="graph-title">${editable?'Interactive':'Given'} coordinate plane</title><desc id="graph-description">Axes range from negative ${r} to ${r}. ${points.length?points.map((p,i)=>LETTERS[i]+' '+pair(p)).join('; ')+'.':'No points yet.'} ${editable?'Use coordinate fields to place or edit points. Focus a plotted point and use arrow keys to move it one unit.':''}</desc>
+      <defs><clipPath id="plot-clip"><rect x="39" y="39" width="482" height="482"/></clipPath><marker id="axis-arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#77718b"/></marker></defs><rect width="560" height="560" fill="#fcfcff"/>`;
+    for(let n=-r;n<=r;n++) {
+      const x=plot({x:n,y:0}).x,y=plot({x:0,y:n}).y;
+      if(n!==0) svg+=`<path d="M${x} 40V520M40 ${y}H520" fill="none" stroke="${n%tickStep===0?'#e1dfea':'#efedf4'}" stroke-width="1"/>`;
+      if(n!==0&&n%tickStep===0) svg+=`<text x="${x}" y="${283+tickFont}" text-anchor="middle" font-size="${tickFont}" fill="#6d687e">${n}</text><text x="267" y="${y+tickFont/3}" text-anchor="end" font-size="${tickFont}" fill="#6d687e">${n}</text>`;
+    }
+    svg+=`<path d="M33 280H527M280 527V33" stroke="#827c94" stroke-width="1.7" marker-start="url(#axis-arrow)" marker-end="url(#axis-arrow)"/><text x="537" y="273" font-size="17" font-style="italic" fill="#625b78">x</text><text x="292" y="25" font-size="17" font-style="italic" fill="#625b78">y</text><text x="267" y="${283+tickFont}" text-anchor="end" font-size="${tickFont}" fill="#6d687e">0</text>`;
+    svg+='<g clip-path="url(#plot-clip)">';
+    if(state.revealed&&state.mode!=='explore') svg+=svgLine(state.problem.line,'#a95513',true);
+    if(editable&&state.drawn) svg+=svgLine(line,'#6650bd');
+    if(state.mode==='write'&&state.revealed) svg+=svgLine(state.problem.line,'#6650bd');
+    if(state.triangle&&line&&!line.degenerate) {
+      const a=plot(line.a),b=plot(line.b),corner=plot({x:line.b.x,y:line.a.y});
+      svg+=`<path d="M${a.x} ${a.y}H${corner.x}V${b.y}" fill="none" stroke="#a95513" stroke-width="2.5" stroke-dasharray="5 4"/>`;
+      if(Math.abs(line.dx)>EPS&&Math.abs(line.dy)>EPS) svg+=`<rect x="${corner.x+(b.x<a.x?0:-8)}" y="${corner.y+(b.y<a.y?-8:0)}" width="8" height="8" fill="none" stroke="#a95513" stroke-width="1.2"/>`;
+    }
+    svg+='</g>';
+    if(state.triangle&&line&&!line.degenerate) {
+      const a=plot(line.a),b=plot(line.b),corner=plot({x:line.b.x,y:line.a.y});
+      const runX=Math.max(84,Math.min(474,(a.x+corner.x)/2)),runY=Math.max(57,Math.min(505,a.y+24));
+      const riseX=Math.max(91,Math.min(469,b.x+(b.x>410?-52:53))),riseY=Math.max(60,Math.min(507,(a.y+b.y)/2));
+      svg+=`<text x="${runX}" y="${runY}" text-anchor="middle" font-size="${guideFont}" font-weight="600" fill="#a95513" stroke="#fcfcff" stroke-width="5" paint-order="stroke">run ${xml(pretty(line.dx))}</text><text x="${riseX}" y="${riseY}" text-anchor="middle" font-size="${guideFont}" font-weight="600" fill="#a95513" stroke="#fcfcff" stroke-width="5" paint-order="stroke">rise ${xml(pretty(line.dy))}</text>`;
+    }
+    points.forEach((p,i)=>{
+      const q=plot(p),label=labelPos(p),color=i<2?'#5b46b6':'#14766e';
+      svg+=`<g ${editable?`class="point" tabindex="0" role="button" data-point="${i}" aria-label="Point ${LETTERS[i]} ${xml(pair(p))}. Use arrow keys to move."`:'role="img" aria-label="Point '+LETTERS[i]+' '+xml(pair(p))+'"'}><circle class="point-halo" cx="${q.x}" cy="${q.y}" r="24" fill="transparent"/><circle cx="${q.x}" cy="${q.y}" r="8" fill="${color}" stroke="white" stroke-width="3"/><text x="${label.x}" y="${label.y}" text-anchor="${label.anchor}" font-size="${pointFont}" font-weight="650" fill="${color}" stroke="#fcfcff" stroke-width="5" paint-order="stroke">${LETTERS[i]} ${xml(pair(p))}</text></g>`;
+    });
+    if(!points.length) svg+=`<rect x="110" y="76" width="340" height="44" rx="8" fill="#f0ecfb"/><text x="280" y="105" text-anchor="middle" fill="#5b46b6" font-size="${pointFont}">${state.mode==='write'?'Use the given information':'Choose Add point to begin'}</text>`;
+    $('graph').innerHTML=svg;
+    $('graph').classList.toggle('read-only',!editable); $('graph').classList.toggle('add-tool',state.tool==='add'&&editable);
+    if(focusIndex!==null) $('graph').querySelector(`[data-point="${focusIndex}"]`)?.focus({preventScroll:true});
+  }
+  function updateTools() {
+    $('move-tool').setAttribute('aria-pressed',String(state.tool==='move')); $('add-tool').setAttribute('aria-pressed',String(state.tool==='add'));
+    $('graph-note').textContent=state.mode==='write'?'Read A and B on the graph. The rise/run guide can help you compare coordinates.':state.tool==='add'?'Tap a grid intersection to add a point (up to 8). A and B define the line.':'Drag points to move them. Drag the drawn line to slide it. Arrow keys move a focused point by 1.';
+    if(state.mode==='write'&&state.source!=='graph') $('graph-note').textContent='Use the given information. Turn on Show given points if you want a visual guide.';
+    $('draw-line').textContent=state.mode==='explore'?(state.drawn?'Hide line':'Show line'):'Draw line';
+  }
+  function updateEditor() {
+    if(state.mode==='write') return;
+    const selected=state.selected<0?'new':String(state.selected);
+    $('point-select').innerHTML=state.points.map((p,i)=>`<option value="${i}">Point ${LETTERS[i]}</option>`).join('')+(state.points.length<8?'<option value="new">New point</option>':'');
+    $('point-select').value=selected;
+    const p=state.points[state.selected];
+    $('point-x').value=p?fmt(p.x):''; $('point-y').value=p?fmt(p.y):'';
+    $('update-point').textContent=p?'Update point':'Place point'; $('remove-point').disabled=!p;
+  }
+  function fitPoints() {
+    const max=Math.max(0,...state.points.flatMap(p=>[Math.abs(p.x),Math.abs(p.y)]));
+    if(max>state.extent) { state.extent=max<=12?12:20; $('range-select').value=String(state.extent); }
+  }
+  function graphChanged(updateFields=true,focus=null) {
+    clearFeedback(); if(updateFields) updateEditor(); updateTools(); drawGraph(focus); updateCalculations();
+    if(state.mode==='explore') {
+      const line=model(state.points); if(line) { $('rise-input').value=fmt(line.dy); $('run-input').value=fmt(line.dx); }
+    }
+  }
+  function setTool(tool) { state.tool=tool; updateTools(); drawGraph(); }
+  function addPoint(p) {
+    if(state.points.length>=8) { feedback('You can use up to 8 points. Move or remove a point before adding another.'); return false; }
+    state.points.push(p); state.selected=state.points.length-1; return true;
+  }
+  function applySlope() {
+    try {
+      const rise=numeric($('rise-input').value),run=numeric($('run-input').value);
+      if(Math.abs(rise)<EPS&&Math.abs(run)<EPS) throw Error('Rise and run cannot both be 0. Use two distinct points.');
+      const a=state.points[0]; if(!a) throw Error('Place point A first.');
+      const b={x:a.x+run,y:a.y+rise};
+      if(Math.abs(b.x)>20||Math.abs(b.y)>20) throw Error('That moves B outside −20 to 20. Use a smaller rise/run or move A.');
+      state.points[1]=b; state.drawn=true; state.selected=1; fitPoints(); graphChanged();
+    } catch(e) { feedback(e.message,'retry'); }
+  }
+  function pointerPosition(e,snap=true) {
+    const svg=$('graph'),matrix=svg.getScreenCTM(); if(!matrix) return null;
+    const screen=new DOMPoint(e.clientX,e.clientY).matrixTransform(matrix.inverse());
+    const p={x:(screen.x-280)*state.extent/240,y:(280-screen.y)*state.extent/240};
+    return {x:snap?Math.round(p.x):p.x,y:snap?Math.round(p.y):p.y,inside:screen.x>=40&&screen.x<=520&&screen.y>=40&&screen.y<=520};
+  }
+  const clamp = v => Math.max(-state.extent,Math.min(state.extent,v));
+  $('graph').addEventListener('pointerdown',e=>{
+    if(state.mode==='write'||e.button>0||state.drag) return;
+    const p=pointerPosition(e),raw=pointerPosition(e,false); if(!p||!p.inside) return;
+    e.preventDefault();
+    const scale=Math.abs($('graph').getScreenCTM().a);
+    const hit=state.points.map((point,i)=>({i,d:Math.hypot(point.x-raw.x,point.y-raw.y)*240/state.extent*scale})).sort((a,b)=>a.d-b.d)[0];
+    if(state.tool==='add') {
+      const duplicate=state.points.findIndex(q=>Math.abs(q.x-p.x)<EPS&&Math.abs(q.y-p.y)<EPS);
+      if(duplicate>=0) { state.selected=duplicate; updateEditor(); feedback('Point '+LETTERS[duplicate]+' is already there. Choose Move to drag it.'); }
+      else if(addPoint({x:clamp(p.x),y:clamp(p.y)})) graphChanged();
+      return;
+    } else if(hit&&hit.d<=24) {
+      state.selected=hit.i; state.drag={id:e.pointerId,type:'point',index:hit.i,start:p}; updateEditor();
+    } else {
+      const line=model(state.points);
+      const distance=line&&!line.degenerate?Math.abs(line.c[0]*raw.x+line.c[1]*raw.y+line.c[2])/Math.hypot(line.c[0],line.c[1])*240/state.extent*scale:Infinity;
+      if(state.drawn&&distance<=14) state.drag={id:e.pointerId,type:'line',start:p,original:state.points.map(q=>({...q}))};
+    }
+    if(state.drag) $('graph').setPointerCapture(e.pointerId);
+  });
+  $('graph').addEventListener('pointermove',e=>{
+    const drag=state.drag; if(!drag||drag.id!==e.pointerId) return;
+    const p=pointerPosition(e); if(!p) return;
+    if(drag.type==='point') state.points[drag.index]={x:clamp(p.x),y:clamp(p.y)};
+    else {
+      let dx=p.x-drag.start.x,dy=p.y-drag.start.y;
+      const minX=Math.min(...drag.original.map(p=>p.x)),maxX=Math.max(...drag.original.map(p=>p.x)),minY=Math.min(...drag.original.map(p=>p.y)),maxY=Math.max(...drag.original.map(p=>p.y));
+      dx=Math.max(-state.extent-minX,Math.min(state.extent-maxX,dx)); dy=Math.max(-state.extent-minY,Math.min(state.extent-maxY,dy));
+      state.points=drag.original.map(q=>({x:q.x+dx,y:q.y+dy}));
+    }
+    graphChanged();
+  });
+  function endDrag(e) { if(state.drag?.id===e.pointerId) { state.drag=null; if($('graph').hasPointerCapture(e.pointerId)) $('graph').releasePointerCapture(e.pointerId); } }
+  $('graph').addEventListener('pointerup',endDrag); $('graph').addEventListener('pointercancel',endDrag); $('graph').addEventListener('lostpointercapture',()=>{state.drag=null;});
+  $('graph').addEventListener('keydown',e=>{
+    const target=e.target.closest('[data-point]'); if(!target) return;
+    const i=Number(target.dataset.point),p=state.points[i]; if(!p) return;
+    const movement={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,1],ArrowDown:[0,-1]}[e.key];
+    if(movement) { e.preventDefault(); state.selected=i; p.x=clamp(p.x+movement[0]); p.y=clamp(p.y+movement[1]); graphChanged(true,i); }
+    else if(e.key==='Enter'||e.key===' ') { e.preventDefault(); state.selected=i; updateEditor(); $('point-x').focus(); }
+  });
+  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>modeChange(b.dataset.mode)));
+  $('new-problem').addEventListener('click',makeProblem);
+  $('source-select').addEventListener('change',e=>{state.source=e.target.value;makeProblem();});
+  $('form-select').addEventListener('change',e=>{state.form=e.target.value;makeProblem();});
+  $('kind-select').addEventListener('change',e=>{state.filter=e.target.value;makeProblem();});
+  $('range-select').addEventListener('change',e=>{
+    const next=Number(e.target.value);
+    if(graphPoints().some(p=>Math.abs(p.x)>next||Math.abs(p.y)>next)) { e.target.value=String(state.extent); feedback('A point is outside that range. Move it inward before choosing a smaller grid.'); return; }
+    state.extent=next; drawGraph();
+  });
+  $('triangle-toggle').addEventListener('change',e=>{state.triangle=e.target.checked;drawGraph();});
+  $('given-toggle').addEventListener('change',e=>{state.showGiven=e.target.checked;drawGraph();});
+  $('move-tool').addEventListener('click',()=>setTool('move'));
+  $('add-tool').addEventListener('click',()=>setTool('add'));
+  $('draw-line').addEventListener('click',()=>{
+    if(state.mode==='explore'&&state.drawn) { state.drawn=false; graphChanged(); return; }
+    const line=model(state.points); if(!line||line.degenerate) { feedback('Plot two distinct points, A and B, to draw a unique line.','retry'); return; }
+    state.drawn=true; state.tool='move'; updateTools(); graphChanged();
+  });
+  $('reset-graph').addEventListener('click',()=>{
+    state.points=state.basePoints.map(p=>({...p})); state.selected=state.points.length?0:-1; state.drawn=state.mode==='explore'; state.tool='move'; updateTools(); graphChanged();
+  });
+  $('point-select').addEventListener('change',e=>{state.selected=e.target.value==='new'?-1:Number(e.target.value);updateEditor();});
+  $('update-point').addEventListener('click',()=>{
+    try {
+      const p={x:numeric($('point-x').value),y:numeric($('point-y').value)};
+      if(Math.abs(p.x)>20||Math.abs(p.y)>20) throw Error('Use coordinates between −20 and 20.');
+      if(state.selected<0) { if(!addPoint(p)) return; } else state.points[state.selected]=p;
+      fitPoints(); graphChanged();
+    } catch(e) { feedback(e.message,'retry'); }
+  });
+  ['point-x','point-y'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter') {e.preventDefault();$('update-point').click();}}));
+  $('remove-point').addEventListener('click',()=>{
+    if(state.selected<0) return; state.points.splice(state.selected,1); state.selected=state.points.length?Math.min(state.selected,state.points.length-1):-1; graphChanged();
+  });
+  function progressSummary() {
+    const solved=state.records.filter(r=>r.solved).length,checks=state.records.reduce((sum,r)=>sum+r.checks,0);
+    const rows=['Writing and Graphing Linear Functions','Anonymous session summary',`Solved without revealing first: ${solved}`,`Answer / graph checks: ${checks}`,''];
+    for(const name of ['Write from a graph','Write from a point & slope','Write from a table','Graph from point-slope','Graph from slope-intercept']) {
+      const subset=state.records.filter(r=>r.name===name); if(subset.length) rows.push(name+': '+subset.filter(r=>r.solved).length+' solved / '+subset.length+' tried');
+    }
+    rows.push('');
+    for(const kind of ['ordinary','horizontal','vertical']) { const subset=state.records.filter(r=>r.kind===kind); if(subset.length) rows.push({ordinary:'Sloped lines',horizontal:'HOY lines',vertical:'VUX lines'}[kind]+': '+subset.filter(r=>r.solved).length+' solved / '+subset.length+' tried'); }
+    rows.push('','Reflection: How do the slope and a known point determine the line?','Explain why HOY has zero slope and VUX has undefined slope.');
+    return rows.join('\n');
+  }
+  function updateProgress() { $('solved-count').textContent=state.records.filter(r=>r.solved).length; $('summary-text').value=progressSummary(); }
+  $('progress-button').addEventListener('click',()=>{const open=$('session-summary').hidden;$('session-summary').hidden=!open;$('progress-button').setAttribute('aria-expanded',String(open));updateProgress();});
+  $('copy-summary').addEventListener('click',async()=>{
+    try { await navigator.clipboard.writeText(progressSummary()); $('copy-status').textContent=' Copied.'; }
+    catch { $('summary-text').focus(); $('summary-text').select(); $('copy-status').textContent=' Select and copy the text above.'; }
+  });
+  window.addEventListener('resize',()=>drawGraph());
+  makeProblem();
+  </script>
+</body>
+</html>
